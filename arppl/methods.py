@@ -11,9 +11,7 @@ def remove_irrelevant_rules(rules, measure):
     if not rules:
         ValueError('Rule list is empty')
 
-    irrelevance_value = rules[0].measures[measure].irrelevance_value
-
-    return [rule for rule in rules if rule.measures[measure].value != irrelevance_value]
+    return [rule for rule in rules if rule.measures[measure].is_relevant()]
 
 
 def group_only_relevant_rules_by_subset(attribute_of_interest, rules, measure):

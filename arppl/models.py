@@ -24,12 +24,14 @@ class Rule:
 
 
 class Measure:
-    __slots__ = ('name', 'value', 'irrelevance_value')
+    __slots__ = ('name', 'value')
 
     def __init__(self, name, value):
         self.name = name
         self.value = value
-        self.irrelevance_value = 0
+
+    def is_relevant(self):
+        return self.value > 0
 
     def better_than(self, other):
         return self.value > other.value
@@ -40,7 +42,9 @@ class Lift(Measure):
 
     def __init__(self, value):
         super().__init__('lift', value)
-        self.irrelevance_value = 1
+
+    def is_relevant(self):
+        return self.value != 1
 
     def _values_represent_the_same_type_of_dependency(self, other_value):
         return self.value < 1 and other_value < 1 or self.value > 1 and other_value > 1
