@@ -1,0 +1,8 @@
+"rules","support","confidence","lift"
+"{simple1=yes} => {simple1=no}", 1.00,1.56,1.66
+"{simple1=yes,simple2=yes} => {simple3=no}",2.55,123.3,5.78
+"{complex1=test with blank spaces,simple1=yes} => {simple3=no}",2.55,123.3,5.78
+"{complex1=test with blank spaces,complex2=test with blank spaces} => {simple3=no}",2.55,123.3,5.78
+"{complex1=[0,5]} => {simple1=no}",2.55,123.3,5.78
+"{complex1=[0,5],simple1=no} => {simple2=no}",2.55,123.3,5.78
+"{complex1=[0,5],complex=text with, comma} => {simple2=no}",2.55,123.3,5.78
