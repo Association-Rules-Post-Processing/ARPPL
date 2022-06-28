@@ -22,6 +22,9 @@ class Rule:
     def better_than(self, other, measure):
         return self.measures[measure].better_than(other.measures[measure])
 
+    def to_string(self):
+        return ','.join(self.antecedent) + ' => ' + self.consequent
+
 
 class Measure:
     __slots__ = ('name', 'value')
@@ -35,6 +38,9 @@ class Measure:
 
     def better_than(self, other):
         return self.value > other.value
+
+    def diff_value(self, other):
+        return self.value - other.value
 
 
 class Lift(Measure):
@@ -54,11 +60,21 @@ class Lift(Measure):
             ValueError('Values must be both greater than 1 or both smaller than 1.')
         return abs(1 - self.value) > abs(1 - other.value)
 
+    def diff_value(self, other):
+        if not self._values_represent_the_same_type_of_dependency(other.value):
+            ValueError('Values must be both greater than 1 or both smaller than 1.')
+        return abs(self.value - other.value)
+
 
 class Group:
-    __slots__ = ('classification', 'name', 'rules')
+    __slots__ = ('name', 'rules')
 
-    def __init__(self, classification, name, rules):
-        self.classification = classification
+    def __init__(self, name, rules):
         self.name = name
         self.rules = rules
+
+    def contain_rule(self, rule):
+        return rule in self.rules
+
+    def to_string(self):
+        return '\n'.join([r.to_string() for r in self.rules])

@@ -15,8 +15,8 @@ def remove_irrelevant_rules(rules, measure):
 
 
 def group_only_relevant_rules_by_subset(attribute_of_interest, rules, measure):
-    parents = {rule.get_key(): rule for rule in rules if rule.length == 2 if rule.length == 2}
-    three_length_rules = [rule for rule in rules if rule.length == 3 if rule.contain_attribute(attribute_of_interest)]
+    parents = {rule.get_key(): rule for rule in rules if rule.length == 2}
+    three_length_rules = [rule for rule in rules if rule.length == 3 and rule.contain_attribute(attribute_of_interest)]
 
     return (get_groups_for_three_length_rules(attribute_of_interest, measure, parents, three_length_rules) +
             get_groups_for_two_length_rules(attribute_of_interest, parents))
@@ -25,32 +25,25 @@ def group_only_relevant_rules_by_subset(attribute_of_interest, rules, measure):
 def get_groups_for_two_length_rules(attribute_of_interest, map_of_rules):
     rules = dict(filter(lambda r: r[1].consequent == attribute_of_interest, map_of_rules.items()))
 
-    return [Group('1', '', [rule, map_of_rules[rule.get_reverse_key()]]) for rule in rules.values()
-            if map_of_rules.get(rule.get_reverse_key())]
+    return [Group('1', [rule, map_of_rules[rule.get_reverse_key()]])
+            for rule in rules.values() if map_of_rules.get(rule.get_reverse_key())]
 
 
 def get_groups_for_three_length_rules(attribute_of_interest, measure, parents, three_length_rules):
-    return [_get_group_for_three_length_rule(rule, parents, attribute_of_interest) for rule in three_length_rules if
-            _rule_can_be_in_a_group(attribute_of_interest, rule, parents, measure)]
+    return [_get_group_for_three_length_rule(rule, parents, attribute_of_interest)
+            for rule in three_length_rules if _rule_can_be_in_a_group(rule, parents, measure)]
 
 
-def _rule_can_be_in_a_group(attribute_of_interest, rule, parents, measure):
+def _rule_can_be_in_a_group(rule, parents, measure):
     first_parent = parents.get(rule.get_key())
     second_parent = parents.get(rule.get_key(1))
 
-    return (_is_there_any_gain_in_keeping_rule_less_general(rule, first_parent, second_parent, measure) and
-            _is_it_possible_to_assign_a_group(attribute_of_interest, rule, first_parent, second_parent))
+    return _is_there_any_gain_in_keeping_rule_less_general(rule, first_parent, second_parent, measure)
 
 
 def _is_there_any_gain_in_keeping_rule_less_general(rule, first_parent, second_parent, measure):
     return ((not first_parent or rule.better_than(first_parent, measure)) and
             (not second_parent or rule.better_than(second_parent, measure)))
-
-
-def _is_it_possible_to_assign_a_group(attribute_of_interest, rule, first_parent, second_parent):
-    return rule.consequent == attribute_of_interest or not first_parent and second_parent and not second_parent.contain_attribute(
-        attribute_of_interest) or not second_parent and first_parent and not first_parent.contain_attribute(
-        attribute_of_interest)
 
 
 def _get_group_for_three_length_rule(rule, parents, attribute_of_interest):
@@ -59,14 +52,21 @@ def _get_group_for_three_length_rule(rule, parents, attribute_of_interest):
     group = None
     if rule.consequent == attribute_of_interest:
         if second_parent and first_parent:
-            group = Group('3', '', [first_parent, second_parent, rule])
+            group = Group('6', [first_parent, second_parent, rule])
         elif second_parent or first_parent:
-            group = Group('4', '', [first_parent if first_parent else second_parent, rule])
+            existing_parent = first_parent if first_parent else second_parent
+            group = Group('7', [existing_parent, rule])
         else:
-            group = Group('5', '', [rule])
+            group = Group('8', [rule])
     else:
-        if not (first_parent and second_parent):
-            candidate_parent = first_parent if first_parent else second_parent
-            if candidate_parent and candidate_parent.antecedent[0] != attribute_of_interest:
-                group = Group('2', '', [rule, candidate_parent])
+        if first_parent and second_parent:
+            group = Group('2', [first_parent, second_parent, rule])
+        elif second_parent or first_parent:
+            existing_parent = first_parent if first_parent else second_parent
+            if existing_parent.antecedent[0] != attribute_of_interest:
+                group = Group('3', [rule, existing_parent])
+            else:
+                group = Group('4', [rule, existing_parent])
+        else:
+            group = Group('5', [rule])
     return group
