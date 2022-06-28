@@ -16,8 +16,8 @@ class Rule:
     def get_reverse_key(self, index=0):
         return self.consequent + '&' + self.antecedent[index]
 
-    def contain_attribute(self, attribute):
-        return attribute in self.antecedent or attribute == self.consequent
+    def contain_item(self, item):
+        return item in self.antecedent or item == self.consequent
 
     def better_than(self, other, measure):
         return self.measures[measure].better_than(other.measures[measure])

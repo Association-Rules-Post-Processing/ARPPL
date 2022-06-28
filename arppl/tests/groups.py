@@ -8,27 +8,27 @@ import arppl.methods as mtd
 class GenerateGroupsCorrectly(unittest.TestCase):
 
     def setUp(self):
-        self.attribute_of_interest = 'attr1=yes'
+        self.item_of_interest = 'attr1=yes'
 
     def test_get_group_1(self):
         rules = [
             # Group 1
-            Rule(antecedent=[self.attribute_of_interest], consequent='attr2=2.5', measures={'lift': Lift(1.5)}),
-            Rule(antecedent=['attr2=2.5'], consequent=self.attribute_of_interest, measures={'lift': Lift(1.5)}),
+            Rule(antecedent=[self.item_of_interest], consequent='attr2=2.5', measures={'lift': Lift(1.5)}),
+            Rule(antecedent=['attr2=2.5'], consequent=self.item_of_interest, measures={'lift': Lift(1.5)}),
 
             # The first rule is irrelevant because of the lift value
-            Rule(antecedent=[self.attribute_of_interest], consequent='attr2=2.5', measures={'lift': Lift(1.0)}),
-            Rule(antecedent=['attr2=2.5'], consequent=self.attribute_of_interest, measures={'lift': Lift(1.5)}),
+            Rule(antecedent=[self.item_of_interest], consequent='attr2=2.5', measures={'lift': Lift(1.0)}),
+            Rule(antecedent=['attr2=2.5'], consequent=self.item_of_interest, measures={'lift': Lift(1.5)}),
 
-            # Rules have no attribute of interest
+            # Rules does not have the item of interest
             Rule(antecedent=['attr3=no'], consequent='attr2=2.5', measures={'lift': Lift(1.5)}),
             Rule(antecedent=['attr2=2.5'], consequent='attr3=no', measures={'lift': Lift(1.5)}),
 
-            # Rule does not pair
-            Rule(antecedent=[self.attribute_of_interest], consequent='attr5=1', measures={'lift': Lift(1.5)}),
+            # Rules does not have the item of interest
+            Rule(antecedent=[self.item_of_interest], consequent='attr5=1', measures={'lift': Lift(1.5)}),
         ]
 
-        groups = mtd.method_select(self.attribute_of_interest, rules, 'lift')
+        groups = mtd.method_select(self.item_of_interest, rules, 'lift')
 
         self.assertEqual(len(groups), 1)
         self.assertEqual(groups[0].name, '1')
@@ -38,20 +38,20 @@ class GenerateGroupsCorrectly(unittest.TestCase):
         rules = [
             # Group 2
             Rule(antecedent=['attr3=no'], consequent='attr2=2.5', measures={'lift': Lift(1.5)}),
-            Rule(antecedent=[self.attribute_of_interest], consequent='attr2=2.5', measures={'lift': Lift(1.2)}),
-            Rule(antecedent=[self.attribute_of_interest, 'attr3=no'], consequent='attr2=2.5',
+            Rule(antecedent=[self.item_of_interest], consequent='attr2=2.5', measures={'lift': Lift(1.2)}),
+            Rule(antecedent=[self.item_of_interest, 'attr3=no'], consequent='attr2=2.5',
                  measures={'lift': Lift(1.6)}),
 
             # The first rule is irrelevant because of the lift value
             Rule(antecedent=['attr4=no'], consequent='attr2=2.5', measures={'lift': Lift(1.0)}),
-            Rule(antecedent=[self.attribute_of_interest], consequent='attr2=2.5', measures={'lift': Lift(1.5)}),
-            Rule(antecedent=[self.attribute_of_interest, 'attr4=no'], consequent='attr2=2.5',
+            Rule(antecedent=[self.item_of_interest], consequent='attr2=2.5', measures={'lift': Lift(1.5)}),
+            Rule(antecedent=[self.item_of_interest, 'attr4=no'], consequent='attr2=2.5',
                  measures={'lift': Lift(1.6)}),
 
             # The less general rule has less lift than the most general
             Rule(antecedent=['attr5=no'], consequent='attr3=2.5', measures={'lift': Lift(1.3)}),
-            Rule(antecedent=[self.attribute_of_interest], consequent='attr3=2.5', measures={'lift': Lift(1.1)}),
-            Rule(antecedent=[self.attribute_of_interest, 'attr5=no'], consequent='attr3=2.5',
+            Rule(antecedent=[self.item_of_interest], consequent='attr3=2.5', measures={'lift': Lift(1.1)}),
+            Rule(antecedent=[self.item_of_interest, 'attr5=no'], consequent='attr3=2.5',
                  measures={'lift': Lift(1.2)}),
 
             # Rules does not have the item of interest
@@ -60,7 +60,7 @@ class GenerateGroupsCorrectly(unittest.TestCase):
             Rule(antecedent=['attr4=yes', 'attr5=yes'], consequent='attr3=2.5', measures={'lift': Lift(1.2)}),
         ]
 
-        groups = mtd.method_select(self.attribute_of_interest, rules, 'lift')
+        groups = mtd.method_select(self.item_of_interest, rules, 'lift')
 
         groups_2 = [g for g in groups if g.name == '2']
         self.assertEqual(len(groups_2), 1)
@@ -70,22 +70,22 @@ class GenerateGroupsCorrectly(unittest.TestCase):
         rules = [
             # Group 3
             Rule(antecedent=['attr3=no'], consequent='attr2=2.5', measures={'lift': Lift(1.5)}),
-            Rule(antecedent=[self.attribute_of_interest, 'attr3=no'], consequent='attr2=2.5',
+            Rule(antecedent=[self.item_of_interest, 'attr3=no'], consequent='attr2=2.5',
                  measures={'lift': Lift(1.6)}),
 
             # The most general rule has the item of interest in the antecedent, so it belongs to Group 4
-            Rule(antecedent=[self.attribute_of_interest], consequent='attr2=1.5', measures={'lift': Lift(1.2)}),
-            Rule(antecedent=[self.attribute_of_interest, 'attr5=yes'], consequent='attr2=1.5',
+            Rule(antecedent=[self.item_of_interest], consequent='attr2=1.5', measures={'lift': Lift(1.2)}),
+            Rule(antecedent=[self.item_of_interest, 'attr5=yes'], consequent='attr2=1.5',
                  measures={'lift': Lift(1.6)}),
 
             # The first rule is irrelevant because of the lift value
             Rule(antecedent=['attr4=no'], consequent='attr2=2.5', measures={'lift': Lift(1.0)}),
-            Rule(antecedent=[self.attribute_of_interest, 'attr4=no'], consequent='attr2=2.5',
+            Rule(antecedent=[self.item_of_interest, 'attr4=no'], consequent='attr2=2.5',
                  measures={'lift': Lift(1.6)}),
 
             # The less general rule has less lift than the most general
             Rule(antecedent=['attr5=no'], consequent='attr3=2.5', measures={'lift': Lift(1.3)}),
-            Rule(antecedent=[self.attribute_of_interest, 'attr5=no'], consequent='attr3=2.5',
+            Rule(antecedent=[self.item_of_interest, 'attr5=no'], consequent='attr3=2.5',
                  measures={'lift': Lift(1.2)}),
 
             # Rules does not have the item of interest
@@ -93,7 +93,7 @@ class GenerateGroupsCorrectly(unittest.TestCase):
             Rule(antecedent=['attr4=yes', 'attr5=yes'], consequent='attr3=2.5', measures={'lift': Lift(1.2)}),
         ]
 
-        groups = mtd.method_select(self.attribute_of_interest, rules, 'lift')
+        groups = mtd.method_select(self.item_of_interest, rules, 'lift')
 
         groups_3 = [g for g in groups if g.name == '3']
         self.assertEqual(len(groups_3), 1)
@@ -102,31 +102,31 @@ class GenerateGroupsCorrectly(unittest.TestCase):
     def test_get_group_4(self):
         rules = [
             # Group 4
-            Rule(antecedent=[self.attribute_of_interest], consequent='attr2=2.5', measures={'lift': Lift(1.2)}),
-            Rule(antecedent=[self.attribute_of_interest, 'attr3=no'], consequent='attr2=2.5',
+            Rule(antecedent=[self.item_of_interest], consequent='attr2=2.5', measures={'lift': Lift(1.2)}),
+            Rule(antecedent=[self.item_of_interest, 'attr3=no'], consequent='attr2=2.5',
                  measures={'lift': Lift(1.6)}),
 
             # The most general rule does not have the item of interest in the antecedent, so it belongs to Group 3
             Rule(antecedent=['attr5=yes'], consequent='attr2=1.5', measures={'lift': Lift(1.2)}),
-            Rule(antecedent=[self.attribute_of_interest, 'attr5=yes'], consequent='attr2=1.5',
+            Rule(antecedent=[self.item_of_interest, 'attr5=yes'], consequent='attr2=1.5',
                  measures={'lift': Lift(1.6)}),
 
             # The first rule is irrelevant because of the lift value
-            Rule(antecedent=[self.attribute_of_interest], consequent='attr2=5.5', measures={'lift': Lift(1.0)}),
-            Rule(antecedent=[self.attribute_of_interest, 'attr4=no'], consequent='attr2=5.5',
+            Rule(antecedent=[self.item_of_interest], consequent='attr2=5.5', measures={'lift': Lift(1.0)}),
+            Rule(antecedent=[self.item_of_interest, 'attr4=no'], consequent='attr2=5.5',
                  measures={'lift': Lift(1.6)}),
 
             # The less general rule has less lift than the most general
-            Rule(antecedent=[self.attribute_of_interest], consequent='attr3=2.5', measures={'lift': Lift(1.3)}),
-            Rule(antecedent=[self.attribute_of_interest, 'attr5=no'], consequent='attr3=2.5',
+            Rule(antecedent=[self.item_of_interest], consequent='attr3=2.5', measures={'lift': Lift(1.3)}),
+            Rule(antecedent=[self.item_of_interest, 'attr5=no'], consequent='attr3=2.5',
                  measures={'lift': Lift(1.2)}),
 
-            # Rules have no attribute of interest
+            # Rules does not have the item of interest
             Rule(antecedent=['attr5=yes'], consequent='attr3=2.5', measures={'lift': Lift(1.1)}),
             Rule(antecedent=['attr4=yes', 'attr5=yes'], consequent='attr3=2.5', measures={'lift': Lift(1.2)}),
         ]
 
-        groups = mtd.method_select(self.attribute_of_interest, rules, 'lift')
+        groups = mtd.method_select(self.item_of_interest, rules, 'lift')
 
         groups_4 = [g for g in groups if g.name == '4']
 
@@ -140,18 +140,18 @@ class GenerateGroupsCorrectly(unittest.TestCase):
     def test_get_group_5(self):
         rules = [
             # Group 5
-            Rule(antecedent=[self.attribute_of_interest, 'attr3=no'], consequent='attr2=2.5',
+            Rule(antecedent=[self.item_of_interest, 'attr3=no'], consequent='attr2=2.5',
                  measures={'lift': Lift(1.6)}),
 
             # Rule is irrelevant
-            Rule(antecedent=[self.attribute_of_interest, 'attr4=no'], consequent='attr2=2.5',
+            Rule(antecedent=[self.item_of_interest, 'attr4=no'], consequent='attr2=2.5',
                  measures={'lift': Lift(1.0)}),
 
             # Rules does not have the item of interest
             Rule(antecedent=['attr4=yes', 'attr5=yes'], consequent='attr3=2.5', measures={'lift': Lift(1.2)}),
         ]
 
-        groups = mtd.method_select(self.attribute_of_interest, rules, 'lift')
+        groups = mtd.method_select(self.item_of_interest, rules, 'lift')
 
         groups_5 = [g for g in groups if g.name == '5']
         self.assertEqual(len(groups_5), 1)
@@ -160,22 +160,22 @@ class GenerateGroupsCorrectly(unittest.TestCase):
     def test_get_group_6(self):
         rules = [
             # Group 6
-            Rule(antecedent=['attr3=no'], consequent=self.attribute_of_interest, measures={'lift': Lift(1.5)}),
-            Rule(antecedent=['attr4=yes'], consequent=self.attribute_of_interest, measures={'lift': Lift(1.3)}),
-            Rule(antecedent=['attr3=no', 'attr4=yes'], consequent=self.attribute_of_interest,
+            Rule(antecedent=['attr3=no'], consequent=self.item_of_interest, measures={'lift': Lift(1.5)}),
+            Rule(antecedent=['attr4=yes'], consequent=self.item_of_interest, measures={'lift': Lift(1.3)}),
+            Rule(antecedent=['attr3=no', 'attr4=yes'], consequent=self.item_of_interest,
                  measures={'lift': Lift(1.6)}),
 
             # The first rule is irrelevant because of the lift value, the third rule will be from group 7
             # If the two less general rules were irrelevant it would be from group 8
-            Rule(antecedent=['attr5=no'], consequent=self.attribute_of_interest, measures={'lift': Lift(1.0)}),
-            Rule(antecedent=['attr6=yes'], consequent=self.attribute_of_interest, measures={'lift': Lift(1.2)}),
-            Rule(antecedent=['attr5=no', 'attr6=yes'], consequent=self.attribute_of_interest,
+            Rule(antecedent=['attr5=no'], consequent=self.item_of_interest, measures={'lift': Lift(1.0)}),
+            Rule(antecedent=['attr6=yes'], consequent=self.item_of_interest, measures={'lift': Lift(1.2)}),
+            Rule(antecedent=['attr5=no', 'attr6=yes'], consequent=self.item_of_interest,
                  measures={'lift': Lift(1.6)}),
 
             # The less general rule has less lift than the most general
-            Rule(antecedent=['attr7=no'], consequent=self.attribute_of_interest, measures={'lift': Lift(1.5)}),
-            Rule(antecedent=['attr8=yes'], consequent=self.attribute_of_interest, measures={'lift': Lift(1.3)}),
-            Rule(antecedent=['attr7=no', 'attr8=yes'], consequent=self.attribute_of_interest,
+            Rule(antecedent=['attr7=no'], consequent=self.item_of_interest, measures={'lift': Lift(1.5)}),
+            Rule(antecedent=['attr8=yes'], consequent=self.item_of_interest, measures={'lift': Lift(1.3)}),
+            Rule(antecedent=['attr7=no', 'attr8=yes'], consequent=self.item_of_interest,
                  measures={'lift': Lift(1.2)}),
 
             # Rules does not have the item of interest
@@ -185,7 +185,7 @@ class GenerateGroupsCorrectly(unittest.TestCase):
                  measures={'lift': Lift(2.6)}),
         ]
 
-        groups = mtd.method_select(self.attribute_of_interest, rules, 'lift')
+        groups = mtd.method_select(self.item_of_interest, rules, 'lift')
 
         groups_6 = list(filter(lambda g: g.name == '6', groups))
 
@@ -195,18 +195,18 @@ class GenerateGroupsCorrectly(unittest.TestCase):
     def test_get_group_7(self):
         rules = [
             # Group 7
-            Rule(antecedent=['attr3=no'], consequent=self.attribute_of_interest, measures={'lift': Lift(1.5)}),
-            Rule(antecedent=['attr3=no', 'attr4=yes'], consequent=self.attribute_of_interest,
+            Rule(antecedent=['attr3=no'], consequent=self.item_of_interest, measures={'lift': Lift(1.5)}),
+            Rule(antecedent=['attr3=no', 'attr4=yes'], consequent=self.item_of_interest,
                  measures={'lift': Lift(1.6)}),
 
             # The first rule is irrelevant because of the lift value, the third rule will be from group 8
-            Rule(antecedent=['attr5=no'], consequent=self.attribute_of_interest, measures={'lift': Lift(1.0)}),
-            Rule(antecedent=['attr5=no', 'attr6=yes'], consequent=self.attribute_of_interest,
+            Rule(antecedent=['attr5=no'], consequent=self.item_of_interest, measures={'lift': Lift(1.0)}),
+            Rule(antecedent=['attr5=no', 'attr6=yes'], consequent=self.item_of_interest,
                  measures={'lift': Lift(1.6)}),
 
             # The less general rule has less lift than the most general
-            Rule(antecedent=['attr7=no'], consequent=self.attribute_of_interest, measures={'lift': Lift(1.5)}),
-            Rule(antecedent=['attr7=no', 'attr8=yes'], consequent=self.attribute_of_interest,
+            Rule(antecedent=['attr7=no'], consequent=self.item_of_interest, measures={'lift': Lift(1.5)}),
+            Rule(antecedent=['attr7=no', 'attr8=yes'], consequent=self.item_of_interest,
                  measures={'lift': Lift(1.2)}),
 
             # Rules does not have the item of interest
@@ -215,7 +215,7 @@ class GenerateGroupsCorrectly(unittest.TestCase):
                  measures={'lift': Lift(2.6)}),
         ]
 
-        groups = mtd.method_select(self.attribute_of_interest, rules, 'lift')
+        groups = mtd.method_select(self.item_of_interest, rules, 'lift')
 
         groups_7 = list(filter(lambda g: g.name == '7', groups))
 
@@ -225,18 +225,18 @@ class GenerateGroupsCorrectly(unittest.TestCase):
     def test_get_group_8(self):
         rules = [
             # Group 8
-            Rule(antecedent=['attr3=no', 'attr4=yes'], consequent=self.attribute_of_interest,
+            Rule(antecedent=['attr3=no', 'attr4=yes'], consequent=self.item_of_interest,
                  measures={'lift': Lift(1.6)}),
 
             # Rule is irrelevant
-            Rule(antecedent=['attr5=no', 'attr6=yes'], consequent=self.attribute_of_interest,
+            Rule(antecedent=['attr5=no', 'attr6=yes'], consequent=self.item_of_interest,
                  measures={'lift': Lift(1.0)}),
 
             # Rule does not have the item of interest
             Rule(antecedent=['attr3=no', 'attr4=yes'], consequent='attr2=h', measures={'lift': Lift(2.6)}),
         ]
 
-        groups = mtd.method_select(self.attribute_of_interest, rules, 'lift')
+        groups = mtd.method_select(self.item_of_interest, rules, 'lift')
 
         self.assertEqual(len(groups), 1)
         self.assertEqual(groups[0].rules[0], rules[0])

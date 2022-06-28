@@ -27,34 +27,34 @@ class TestConversionDataFrameToRules(unittest.TestCase):
         self.assertEqual(rule.antecedent[1], 'simple2=yes')
         self.assertEqual(rule.consequent, 'simple3=no')
 
-    def test_can_get_antecedent_in_length_three_rules_when_only_one_attribute_has_blank_spaces(self):
+    def test_can_get_antecedent_in_length_three_rules_when_only_one_item_has_blank_spaces(self):
         rule = self.rules[2]
         self.assertEqual(rule.length, 3)
         self.assertEqual(rule.antecedent[0], 'complex1=test with blank spaces')
         self.assertEqual(rule.antecedent[1], 'simple1=yes')
         self.assertEqual(rule.consequent, 'simple3=no')
 
-    def test_can_get_antecedent_in_length_three_rules_when_two_attributes_has_blank_spaces(self):
+    def test_can_get_antecedent_in_length_three_rules_when_two_items_has_blank_spaces(self):
         rule = self.rules[3]
         self.assertEqual(rule.length, 3)
         self.assertEqual(rule.antecedent[0], 'complex1=test with blank spaces')
         self.assertEqual(rule.antecedent[1], 'complex2=test with blank spaces')
         self.assertEqual(rule.consequent, 'simple3=no')
 
-    def test_can_get_antecedent_in_length_two_rules_when_attribute_value_has_comma(self):
+    def test_can_get_antecedent_in_length_two_rules_when_item_value_has_comma(self):
         rule = self.rules[4]
         self.assertEqual(rule.length, 2)
         self.assertEqual(rule.antecedent[0], 'complex1=[0,5]')
         self.assertEqual(rule.consequent, 'simple1=no')
 
-    def test_can_get_antecedent_in_length_three_rules_when_only_one_attribute_value_has_comma(self):
+    def test_can_get_antecedent_in_length_three_rules_when_only_one_item_value_has_comma(self):
         rule = self.rules[5]
         self.assertEqual(rule.length, 3)
         self.assertEqual(rule.antecedent[0], 'complex1=[0,5]')
         self.assertEqual(rule.antecedent[1], 'simple1=no')
         self.assertEqual(rule.consequent, 'simple2=no')
 
-    def test_can_get_antecedent_in_length_three_rules_when_two_attribute_values_has_comma(self):
+    def test_can_get_antecedent_in_length_three_rules_when_two_item_values_has_comma(self):
         rule = self.rules[6]
         self.assertEqual(rule.length, 3)
         self.assertEqual(rule.antecedent[0], 'complex1=[0,5]')
