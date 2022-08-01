@@ -1,11 +1,52 @@
-class Rule:
-    __slots__ = ('antecedent', 'consequent', 'length', 'measures')
+import math
 
-    def __init__(self, antecedent, consequent, measures):
+
+class Rule:
+    # https://www.rdocumentation.org/packages/arules/versions/1.6-8/topics/interestMeasure
+    __slots__ = ('antecedent',
+                 'consequent',
+                 'length',
+                 'support',
+                 'confidence',
+                 'lift',
+                 'conviction',
+                 'hyper_confidence',
+                 'cosine',
+                 'chi_square',
+                 'coverage',
+                 'doc',
+                 'gini',
+                 'hyper_lift')
+
+    def __init__(self,
+                 antecedent,
+                 consequent,
+                 support=None,
+                 confidence=None,
+                 lift=None,
+                 conviction=None,
+                 hyper_confidence=None,
+                 cosine=None,
+                 chi_square=None,
+                 coverage=None,
+                 doc=None,
+                 gini=None,
+                 hyper_lift=None,
+                 ):
         self.antecedent = antecedent
         self.consequent = consequent
         self.length = len(antecedent) + 1
-        self.measures = measures
+        self.support = support
+        self.confidence = confidence
+        self.lift = lift
+        self.conviction = conviction
+        self.hyper_confidence = hyper_confidence
+        self.cosine = cosine
+        self.chi_square = chi_square
+        self.coverage = coverage
+        self.doc = doc
+        self.gini = gini
+        self.hyper_lift = hyper_lift
 
     def __eq__(self, other):
         return len(set(self.antecedent).difference(other.antecedent)) == 0 and self.consequent == other.consequent
@@ -20,17 +61,16 @@ class Rule:
         return item in self.antecedent or item == self.consequent
 
     def better_than(self, other, measure):
-        return self.measures[measure].better_than(other.measures[measure])
+        return getattr(self, measure).better_than(getattr(other, measure))
 
     def to_string(self):
         return ','.join(self.antecedent) + ' => ' + self.consequent
 
 
 class Measure:
-    __slots__ = ('name', 'value')
+    __slots__ = 'value'
 
-    def __init__(self, name, value):
-        self.name = name
+    def __init__(self, value):
         self.value = value
 
     def is_relevant(self):
@@ -43,11 +83,11 @@ class Measure:
         return self.value - other.value
 
 
-class Lift(Measure):
+class MeasureIndependentlyAtOne(Measure):
     __slots__ = ()
 
     def __init__(self, value):
-        super().__init__('lift', value)
+        super().__init__(value)
 
     def is_relevant(self):
         return self.value != 1
