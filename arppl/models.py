@@ -94,7 +94,7 @@ class MeasureIndependentlyAtOne(Measure):
         super().__init__(value)
 
     def is_relevant(self):
-        return self.value != 1
+        return self.value > 1
 
     def _values_represent_the_same_type_of_dependency(self, other_value):
         return self.value < 1 and other_value < 1 or self.value > 1 and other_value > 1
