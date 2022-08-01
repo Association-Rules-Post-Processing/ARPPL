@@ -63,6 +63,10 @@ class Rule:
     def better_than(self, other, measure):
         return getattr(self, measure).better_than(getattr(other, measure))
 
+    def measure_value_is_relevant(self, measure):
+        measure_ref = getattr(self, measure)
+        return measure_ref and measure_ref.is_relevant()
+
     def to_string(self):
         return ','.join(self.antecedent) + ' => ' + self.consequent
 
