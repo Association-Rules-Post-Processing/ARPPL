@@ -100,6 +100,9 @@ class Group:
         self.name = name
         self.rules = rules
 
+    def __eq__(self, other):
+        return self.name == other.name and all([self.contain_rule(r) for r in other.rules])
+
     def contain_rule(self, rule):
         return rule in self.rules
 
