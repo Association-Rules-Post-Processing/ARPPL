@@ -1,10 +1,10 @@
 from arppl.models import Group
 
 
-def method_select(item_of_interest, rules, measure):
+def method_select(item_of_interest, rules, measure, minimal_improvement=0.001):
     rules = remove_irrelevant_rules(rules, measure)
 
-    return group_only_relevant_rules_by_subset(item_of_interest, rules, measure)
+    return group_only_relevant_rules_by_subset(item_of_interest, rules, measure, minimal_improvement)
 
 
 def remove_irrelevant_rules(rules, measure):
@@ -14,11 +14,12 @@ def remove_irrelevant_rules(rules, measure):
     return [rule for rule in rules if rule.measure_value_is_relevant(measure)]
 
 
-def group_only_relevant_rules_by_subset(item_of_interest, rules, measure):
+def group_only_relevant_rules_by_subset(item_of_interest, rules, measure, minimal_improvement):
     parents = {rule.get_key(): rule for rule in rules if rule.length == 2}
     three_length_rules = [rule for rule in rules if rule.length == 3 and rule.contain_item(item_of_interest)]
 
-    return (get_groups_for_three_length_rules(item_of_interest, measure, parents, three_length_rules) +
+    return (get_groups_for_three_length_rules(item_of_interest, measure, parents, three_length_rules,
+                                              minimal_improvement) +
             get_groups_for_two_length_rules(item_of_interest, parents))
 
 
@@ -29,21 +30,22 @@ def get_groups_for_two_length_rules(item_of_interest, map_of_rules):
             for rule in rules.values() if map_of_rules.get(rule.get_reverse_key())]
 
 
-def get_groups_for_three_length_rules(item_of_interest, measure, parents, three_length_rules):
+def get_groups_for_three_length_rules(item_of_interest, measure, parents, three_length_rules, minimal_improvement):
     return [_get_group_for_three_length_rule(rule, parents, item_of_interest)
-            for rule in three_length_rules if _rule_can_be_in_a_group(rule, parents, measure)]
+            for rule in three_length_rules if _rule_can_be_in_a_group(rule, parents, measure, minimal_improvement)]
 
 
-def _rule_can_be_in_a_group(rule, parents, measure):
+def _rule_can_be_in_a_group(rule, parents, measure, minimal_improvement):
     first_parent = parents.get(rule.get_key())
     second_parent = parents.get(rule.get_key(1))
 
-    return _is_there_any_gain_in_keeping_rule_less_general(rule, first_parent, second_parent, measure)
+    return _is_there_any_gain_in_keeping_rule_less_general(
+        rule, first_parent, second_parent, measure, minimal_improvement)
 
 
-def _is_there_any_gain_in_keeping_rule_less_general(rule, first_parent, second_parent, measure):
-    return ((not first_parent or rule.better_than(first_parent, measure)) and
-            (not second_parent or rule.better_than(second_parent, measure)))
+def _is_there_any_gain_in_keeping_rule_less_general(rule, first_parent, second_parent, measure, minimal_improvement):
+    return ((not first_parent or rule.better_than(first_parent, measure, minimal_improvement)) and
+            (not second_parent or rule.better_than(second_parent, measure, minimal_improvement)))
 
 
 def _get_group_for_three_length_rule(rule, parents, item_of_interest):

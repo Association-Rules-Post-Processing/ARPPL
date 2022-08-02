@@ -1,6 +1,3 @@
-import math
-
-
 class Rule:
     # https://www.rdocumentation.org/packages/arules/versions/1.6-8/topics/interestMeasure
     __slots__ = ('antecedent',
@@ -60,8 +57,10 @@ class Rule:
     def contain_item(self, item):
         return item in self.antecedent or item == self.consequent
 
-    def better_than(self, other, measure):
-        return getattr(self, measure).better_than(getattr(other, measure))
+    def better_than(self, other, measure, minimal_improvement):
+        measure_ref = getattr(self, measure)
+        other_measure_ref = getattr(other, measure)
+        return measure_ref and other_measure_ref and measure_ref.better_than(other_measure_ref, minimal_improvement)
 
     def measure_value_is_relevant(self, measure):
         measure_ref = getattr(self, measure)
@@ -80,11 +79,8 @@ class Measure:
     def is_relevant(self):
         return self.value > 0
 
-    def better_than(self, other):
-        return self.value > other.value
-
-    def diff_value(self, other):
-        return self.value - other.value
+    def better_than(self, other, minimal_improvement):
+        return (self.value - other.value)/other.value >= minimal_improvement
 
 
 class MeasureIndependentlyAtOne(Measure):
@@ -95,19 +91,6 @@ class MeasureIndependentlyAtOne(Measure):
 
     def is_relevant(self):
         return self.value > 1
-
-    def _values_represent_the_same_type_of_dependency(self, other_value):
-        return self.value < 1 and other_value < 1 or self.value > 1 and other_value > 1
-
-    def better_than(self, other):
-        if not self._values_represent_the_same_type_of_dependency(other.value):
-            ValueError('Values must be both greater than 1 or both smaller than 1.')
-        return abs(1 - self.value) > abs(1 - other.value)
-
-    def diff_value(self, other):
-        if not self._values_represent_the_same_type_of_dependency(other.value):
-            ValueError('Values must be both greater than 1 or both smaller than 1.')
-        return abs(self.value - other.value)
 
 
 class Group:
