@@ -1,17 +1,17 @@
 from arppl.models import Group
 
 
-def method_select(item_of_interest, rules, measure, minimal_improvement=0.001):
-    rules = remove_irrelevant_rules(rules, measure)
+def method_select(item_of_interest, rules, measure, minimal_improvement=0.001, relevance_range=0):
+    rules = remove_irrelevant_rules(rules, measure, relevance_range)
 
     return group_only_relevant_rules_by_subset(item_of_interest, rules, measure, minimal_improvement)
 
 
-def remove_irrelevant_rules(rules, measure):
+def remove_irrelevant_rules(rules, measure, relevance_range):
     if not rules:
         ValueError('Rule list is empty')
 
-    return [rule for rule in rules if rule.measure_value_is_relevant(measure)]
+    return [rule for rule in rules if rule.measure_value_is_relevant(measure, relevance_range)]
 
 
 def group_only_relevant_rules_by_subset(item_of_interest, rules, measure, minimal_improvement):

@@ -62,9 +62,9 @@ class Rule:
         other_measure_ref = getattr(other, measure)
         return measure_ref and other_measure_ref and measure_ref.better_than(other_measure_ref, minimal_improvement)
 
-    def measure_value_is_relevant(self, measure):
+    def measure_value_is_relevant(self, measure, relevance_range):
         measure_ref = getattr(self, measure)
-        return measure_ref and measure_ref.is_relevant()
+        return measure_ref and measure_ref.is_relevant(relevance_range)
 
     def to_string(self):
         return ','.join(self.antecedent) + ' => ' + self.consequent
@@ -76,8 +76,8 @@ class Measure:
     def __init__(self, value):
         self.value = value
 
-    def is_relevant(self):
-        return self.value > 0
+    def is_relevant(self, relevance_range):
+        return self.value > 0 + relevance_range
 
     def better_than(self, other, minimal_improvement):
         return (self.value - other.value)/other.value >= minimal_improvement
@@ -89,8 +89,8 @@ class MeasureIndependentlyAtOne(Measure):
     def __init__(self, value):
         super().__init__(value)
 
-    def is_relevant(self):
-        return self.value > 1
+    def is_relevant(self, relevance_range):
+        return self.value > 1 + relevance_range
 
 
 class Group:
