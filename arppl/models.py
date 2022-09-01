@@ -13,7 +13,9 @@ class Rule:
                  'coverage',
                  'doc',
                  'gini',
-                 'hyper_lift')
+                 'hyper_lift',
+                 'odds_ratio',
+                 )
 
     def __init__(self,
                  antecedent,
@@ -29,6 +31,7 @@ class Rule:
                  doc=None,
                  gini=None,
                  hyper_lift=None,
+                 odds_ratio=None,
                  ):
         self.antecedent = antecedent
         self.consequent = consequent
@@ -44,6 +47,7 @@ class Rule:
         self.doc = doc
         self.gini = gini
         self.hyper_lift = hyper_lift
+        self.odds_ratio = odds_ratio
 
     def __eq__(self, other):
         return len(set(self.antecedent).symmetric_difference(other.antecedent)) == 0 and \

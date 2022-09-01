@@ -43,7 +43,8 @@ def create_rules_from_row(row):
         _get_treated_measure_value_from_row(row.coverage, models.Measure),
         _get_treated_measure_value_from_row(row.doc, models.Measure),
         _get_treated_measure_value_from_row(row.gini, models.Measure),
-        _get_treated_measure_value_from_row(row.hyperLift, models.Measure)
+        _get_treated_measure_value_from_row(row.hyperLift, models.Measure),
+        _get_treated_measure_value_from_row(row.oddsRatio, models.MeasureIndependentlyAtOne)
     )
 
 
@@ -76,6 +77,7 @@ def export_groups_to_xlsx(directory, filename, groups):
         worksheet.write('J1', 'Doc')
         worksheet.write('K1', 'Gini')
         worksheet.write('L1', 'Hiper Lift')
+        worksheet.write('M1', 'Odds Ratio')
 
         i = 2
         for group in gps:
@@ -92,6 +94,7 @@ def export_groups_to_xlsx(directory, filename, groups):
                 _write_value_in_xlsx('J' + str(i), r.doc.value, worksheet)
                 _write_value_in_xlsx('K' + str(i), r.gini.value, worksheet)
                 _write_value_in_xlsx('L' + str(i), r.hyper_lift.value, worksheet)
+                _write_value_in_xlsx('M' + str(i), r.odds_ratio.value, worksheet)
                 i += 1
             i += 1
     workbook.close()
@@ -100,4 +103,3 @@ def export_groups_to_xlsx(directory, filename, groups):
 def _write_value_in_xlsx(cell, value, worksheet):
     if value:
         worksheet.write(cell, 'Inf' if math.isinf(value) else value)
-
