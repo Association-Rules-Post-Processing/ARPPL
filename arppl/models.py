@@ -46,7 +46,8 @@ class Rule:
         self.hyper_lift = hyper_lift
 
     def __eq__(self, other):
-        return len(set(self.antecedent).difference(other.antecedent)) == 0 and self.consequent == other.consequent
+        return len(set(self.antecedent).symmetric_difference(other.antecedent)) == 0 and \
+               self.consequent == other.consequent
 
     def get_key(self, index=0):
         return self.antecedent[index] + '&' + self.consequent
