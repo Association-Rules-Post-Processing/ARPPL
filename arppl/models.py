@@ -85,7 +85,7 @@ class Measure:
         return self.value > 0 + relevance_range
 
     def better_than(self, other, minimal_improvement):
-        return (self.value - other.value)/other.value >= minimal_improvement
+        return (self.value - other.value) / other.value >= minimal_improvement
 
 
 class MeasureIndependentlyAtOne(Measure):
@@ -99,11 +99,12 @@ class MeasureIndependentlyAtOne(Measure):
 
 
 class Group:
-    __slots__ = ('name', 'rules')
+    __slots__ = ('name', 'rules', 'additional_rules')
 
     def __init__(self, name, rules):
         self.name = name
         self.rules = rules
+        self.additional_rules = []
 
     def __eq__(self, other):
         return self.name == other.name and all([self.contain_rule(r) for r in other.rules])
