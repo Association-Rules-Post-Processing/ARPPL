@@ -1,3 +1,6 @@
+import re
+
+
 class Rule:
     # https://www.rdocumentation.org/packages/arules/versions/1.6-8/topics/interestMeasure
     __slots__ = ('antecedent',
@@ -74,6 +77,12 @@ class Rule:
         measure_ref = getattr(self, measure)
         return measure_ref and measure_ref.is_relevant(relevance_range)
 
+    def has_empty_value(self):
+        _COMPILED_EMPTY_PATTERN = re.compile('^.*=(.*)$')
+
+        return not _COMPILED_EMPTY_PATTERN.search(self.consequent).group(1) or any(
+            [not _COMPILED_EMPTY_PATTERN.search(a).group(1) for a in self.antecedent])
+
     def to_string(self):
         return ','.join(self.antecedent) + ' => ' + self.consequent
 
@@ -88,7 +97,7 @@ class Measure:
         return self.value > 0 + relevance_range
 
     def better_than(self, other, minimal_improvement):
-        return (self.value - other.value)/other.value >= minimal_improvement
+        return (self.value - other.value) / other.value >= minimal_improvement
 
 
 class MeasureIndependentlyAtOne(Measure):

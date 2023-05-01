@@ -1,10 +1,18 @@
 from arppl.models import Group
 
 
-def method_select(item_of_interest, rules, measure, minimal_improvement=0.001, relevance_range=0):
+def method_select(item_of_interest, rules, measure, minimal_improvement=0.001, relevance_range=0,
+                  allow_empty_items=False):
+    if not allow_empty_items:
+        rules = remove_rules_with_empty_items(rules)
+
     rules = remove_irrelevant_rules(rules, measure, relevance_range)
 
     return group_only_relevant_rules_by_subset(item_of_interest, rules, measure, minimal_improvement)
+
+
+def remove_rules_with_empty_items(rules):
+    return [rule for rule in rules if not rule.has_empty_value()]
 
 
 def remove_irrelevant_rules(rules, measure, relevance_range):
