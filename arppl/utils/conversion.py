@@ -7,6 +7,7 @@ from arppl import models
 
 _DEFAULT_RULE_SEPARATOR = ' => '
 _COMPILED_PATTERN = re.compile('^(.*=.*),(.*=.*)$|^(.*=.*)$')
+_COMPILED_BOOLEAN_PATTERN = re.compile('^(.*),(.*)$|^(.*)$')
 
 
 def convert_data_frame_to_rule_list(data_frame, rule_separator=_DEFAULT_RULE_SEPARATOR):
@@ -20,6 +21,9 @@ def convert_data_frame_to_rule_list(data_frame, rule_separator=_DEFAULT_RULE_SEP
 
 def split_antecedent(antecedent):
     items = _COMPILED_PATTERN.search(antecedent)
+
+    if not items:
+        items = _COMPILED_BOOLEAN_PATTERN.search(antecedent)
 
     if items.group(2):
         return [items.group(1), items.group(2)]
@@ -38,13 +42,14 @@ def create_rules_from_row(row):
         _get_treated_measure_value_from_row(row.lift, models.MeasureIndependentlyAtOne),
         _get_treated_measure_value_from_row(row.conviction, models.MeasureIndependentlyAtOne),
         _get_treated_measure_value_from_row(row.hyperConfidence, models.Measure),
-        _get_treated_measure_value_from_row(row.cosine, models.Measure),
+        _get_treated_measure_value_from_row(row.cosine, models.MeasureIndependentlyAtHalf),
         _get_treated_measure_value_from_row(row.chiSquare, models.Measure),
         _get_treated_measure_value_from_row(row.coverage, models.Measure),
         _get_treated_measure_value_from_row(row.doc, models.Measure),
         _get_treated_measure_value_from_row(row.gini, models.Measure),
-        _get_treated_measure_value_from_row(row.hyperLift, models.Measure),
-        _get_treated_measure_value_from_row(row.oddsRatio, models.MeasureIndependentlyAtOne)
+        _get_treated_measure_value_from_row(row.hyperLift, models.MeasureIndependentlyAtOne),
+        _get_treated_measure_value_from_row(row.oddsRatio, models.MeasureIndependentlyAtOne),
+        _get_treated_measure_value_from_row(row.kappa, models.Measure)
     )
 
 
@@ -78,6 +83,7 @@ def export_groups_to_xlsx(directory, filename, groups):
         worksheet.write('K1', 'Gini')
         worksheet.write('L1', 'Hiper Lift')
         worksheet.write('M1', 'Odds Ratio')
+        worksheet.write('N1', 'Kappa')
 
         i = 2
         for group in gps:
@@ -95,6 +101,7 @@ def export_groups_to_xlsx(directory, filename, groups):
                 _write_value_in_xlsx('K' + str(i), r.gini.value, worksheet)
                 _write_value_in_xlsx('L' + str(i), r.hyper_lift.value, worksheet)
                 _write_value_in_xlsx('M' + str(i), r.odds_ratio.value, worksheet)
+                _write_value_in_xlsx('N' + str(i), r.kappa.value, worksheet)
                 i += 1
             i += 1
     workbook.close()
