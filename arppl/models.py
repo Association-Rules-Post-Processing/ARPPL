@@ -15,6 +15,7 @@ class Rule:
                  'gini',
                  'hyper_lift',
                  'odds_ratio',
+                 'kappa',
                  )
 
     def __init__(self,
@@ -32,6 +33,7 @@ class Rule:
                  gini=None,
                  hyper_lift=None,
                  odds_ratio=None,
+                 kappa=None,
                  ):
         self.antecedent = antecedent
         self.consequent = consequent
@@ -48,6 +50,7 @@ class Rule:
         self.gini = gini
         self.hyper_lift = hyper_lift
         self.odds_ratio = odds_ratio
+        self.kappa = kappa
 
     def __eq__(self, other):
         return len(set(self.antecedent).symmetric_difference(other.antecedent)) == 0 and \
@@ -96,6 +99,16 @@ class MeasureIndependentlyAtOne(Measure):
 
     def is_relevant(self, relevance_range):
         return self.value > 1 + relevance_range
+
+
+class MeasureIndependentlyAtHalf(Measure):
+    __slots__ = ()
+
+    def __init__(self, value):
+        super().__init__(value)
+
+    def is_relevant(self, relevance_range):
+        return self.value > 0.5 + relevance_range
 
 
 class Group:
