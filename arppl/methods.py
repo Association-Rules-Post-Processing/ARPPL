@@ -39,44 +39,51 @@ def get_groups_for_two_length_rules(item_of_interest, map_of_rules):
 
 
 def get_groups_for_three_length_rules(item_of_interest, measure, parents, three_length_rules, minimal_improvement):
-    return [_get_group_for_three_length_rule(rule, parents, item_of_interest)
-            for rule in three_length_rules if _rule_can_be_in_a_group(rule, parents, measure, minimal_improvement)]
+    return [group for group in
+            map(lambda r: _get_group_for_three_length_rule(r, parents, item_of_interest, measure, minimal_improvement),
+                three_length_rules) if group is not None]
 
 
-def _rule_can_be_in_a_group(rule, parents, measure, minimal_improvement):
+def _get_the_gain_of_the_less_general_rule(rule, first_parent, second_parent, measure):
+    gain_first = rule.get_gain_in_relation_to(first_parent, measure) if first_parent else None
+    gain_second = rule.get_gain_in_relation_to(second_parent, measure) if second_parent else None
+
+    if gain_first is not None and gain_second is not None:
+        return gain_first if gain_first < gain_second else gain_second
+    elif gain_first is not None:
+        return gain_first
+    elif gain_second is not None:
+        return gain_second
+    else:
+        return None
+
+
+def _get_group_for_three_length_rule(rule, parents, item_of_interest, measure, minimal_improvement):
     first_parent = parents.get(rule.get_key())
     second_parent = parents.get(rule.get_key(1))
+    gain = _get_the_gain_of_the_less_general_rule(rule, first_parent, second_parent, measure)
 
-    return _is_there_any_gain_in_keeping_rule_less_general(
-        rule, first_parent, second_parent, measure, minimal_improvement)
+    if gain is not None and gain < minimal_improvement:
+        return None
 
-
-def _is_there_any_gain_in_keeping_rule_less_general(rule, first_parent, second_parent, measure, minimal_improvement):
-    return ((not first_parent or rule.better_than(first_parent, measure, minimal_improvement)) and
-            (not second_parent or rule.better_than(second_parent, measure, minimal_improvement)))
-
-
-def _get_group_for_three_length_rule(rule, parents, item_of_interest):
-    first_parent = parents.get(rule.get_key())
-    second_parent = parents.get(rule.get_key(1))
     group = None
     if rule.consequent == item_of_interest:
         if second_parent and first_parent:
-            group = Group('6', [first_parent, second_parent, rule])
+            group = Group('6', [first_parent, second_parent, rule], gain)
         elif second_parent or first_parent:
             existing_parent = first_parent if first_parent else second_parent
-            group = Group('7', [existing_parent, rule])
+            group = Group('7', [existing_parent, rule], gain)
         else:
             group = Group('8', [rule])
     else:
         if first_parent and second_parent:
-            group = Group('2', [first_parent, second_parent, rule])
+            group = Group('2', [first_parent, second_parent, rule], gain)
         elif second_parent or first_parent:
             existing_parent = first_parent if first_parent else second_parent
             if existing_parent.antecedent[0] != item_of_interest:
-                group = Group('3', [rule, existing_parent])
+                group = Group('3', [rule, existing_parent], gain)
             else:
-                group = Group('4', [rule, existing_parent])
+                group = Group('4', [rule, existing_parent], gain)
         else:
             group = Group('5', [rule])
     return group

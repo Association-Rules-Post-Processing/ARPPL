@@ -68,10 +68,14 @@ class Rule:
     def contain_item(self, item):
         return item in self.antecedent or item == self.consequent
 
-    def better_than(self, other, measure, minimal_improvement):
+    def get_gain_in_relation_to(self, other, measure):
         measure_ref = getattr(self, measure)
         other_measure_ref = getattr(other, measure)
-        return measure_ref and other_measure_ref and measure_ref.better_than(other_measure_ref, minimal_improvement)
+
+        if not measure_ref or not other_measure_ref:
+            ValueError('Measure not found')
+
+        return (measure_ref.value - other_measure_ref.value) / other_measure_ref.value
 
     def measure_value_is_relevant(self, measure, relevance_range):
         measure_ref = getattr(self, measure)
@@ -96,9 +100,6 @@ class Measure:
     def is_relevant(self, relevance_range):
         return self.value > 0 + relevance_range
 
-    def better_than(self, other, minimal_improvement):
-        return (self.value - other.value) / other.value >= minimal_improvement
-
 
 class MeasureIndependentlyAtOne(Measure):
     __slots__ = ()
@@ -121,11 +122,12 @@ class MeasureIndependentlyAtHalf(Measure):
 
 
 class Group:
-    __slots__ = ('name', 'rules')
+    __slots__ = ('name', 'rules', 'gain')
 
-    def __init__(self, name, rules):
+    def __init__(self, name, rules, gain=None):
         self.name = name
         self.rules = rules
+        self.gain = gain
 
     def __eq__(self, other):
         return self.name == other.name and all([self.contain_rule(r) for r in other.rules])
