@@ -9,14 +9,19 @@ from arppl.models import Type7
 from arppl.models import Type8
 
 
-def method_select(item_of_interest, rules, measure, minimal_improvement=0.001, relevance_range=0,
+def method_select(item_of_interest, rules, measure, minimal_improvement=0.001, relevance_range=0, minimum_confidence=0,
                   allow_empty_items=False):
     if not allow_empty_items:
-        rules = remove_rules_with_empty_items(rules)
+        rules = remove_rules_with_empty_items(rules=rules)
 
-    rules = remove_irrelevant_rules(rules, measure, relevance_range)
+    rules = remove_irrelevant_rules(rules=rules, measure=measure, relevance_range=relevance_range)
 
-    return group_only_relevant_rules_by_subset(item_of_interest, rules, measure, minimal_improvement)
+    return group_only_relevant_rules_by_subset(
+        item_of_interest=item_of_interest,
+        rules=rules,
+        measure=measure,
+        minimal_improvement=minimal_improvement,
+        minimum_confidence=minimum_confidence)
 
 
 def remove_rules_with_empty_items(rules):
@@ -30,9 +35,10 @@ def remove_irrelevant_rules(rules, measure, relevance_range):
     return [rule for rule in rules if rule.measure_value_is_relevant(measure, relevance_range)]
 
 
-def group_only_relevant_rules_by_subset(item_of_interest, rules, measure, minimal_improvement):
+def group_only_relevant_rules_by_subset(item_of_interest, rules, measure, minimal_improvement, minimum_confidence):
     parents = {rule.get_key(): rule for rule in rules if rule.length == 2}
-    three_length_rules = [rule for rule in rules if rule.length == 3 and rule.contain_item(item_of_interest)]
+    three_length_rules = [rule for rule in rules if rule.length == 3 and rule.contain_item(
+        item_of_interest) and rule.confidence.value >= minimum_confidence]
 
     return (get_groups_for_three_length_rules(item_of_interest, measure, parents, three_length_rules,
                                               minimal_improvement) +
