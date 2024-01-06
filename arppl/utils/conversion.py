@@ -1,6 +1,6 @@
 import re
+from collections import defaultdict
 import xlsxwriter
-from itertools import groupby
 import math
 import string
 
@@ -98,14 +98,27 @@ def _get_treated_measure_value_from_row(row, column, is_probability, measure_cla
 def export_groups_to_xlsx(directory, filename, groups, measures, interest_measure):
     workbook = xlsxwriter.Workbook(directory + filename)
 
-    sorted_groups = sorted(groups, key=lambda x: x.name)
-    groups_by_name = groupby(sorted_groups, key=lambda x: x.name)
+    groups_by_name = defaultdict(list)
+    for g in groups:
+        groups_by_name[g.name].append(g)
 
-    for key, gps in groups_by_name:
-        groups_as_list = list(gps)
-        sorted_gps = sorted(groups_as_list)
+    worksheet = workbook.add_worksheet('Summary')
+    types = sorted(groups_by_name.keys())
 
-        worksheet = workbook.add_worksheet('Grupo ' + key)
+    idx = 0
+    for idx, key in enumerate(types):
+        worksheet.write('A' + key, 'Type ' + key)
+        worksheet.write('B' + key, len(groups_by_name[key]))
+
+    idx += 2
+    worksheet.write('A' + str(idx), 'Total')
+    worksheet.write('B' + str(idx), len(groups))
+
+    for key in types:
+        groups_as_list = groups_by_name[key]
+        sorted_gps = sorted(groups_as_list, reverse=True)
+
+        worksheet = workbook.add_worksheet('Type ' + key)
         # Total
         worksheet.write('A1', 'Total')
         worksheet.write('B1', len(groups_as_list))
